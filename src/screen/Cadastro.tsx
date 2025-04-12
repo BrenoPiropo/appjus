@@ -4,35 +4,32 @@ import {
   Alert, StyleSheet, Image, KeyboardAvoidingView, Platform
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Props {
   navigation: StackNavigationProp<any>;
 }
 
-const Login = ({ navigation }: Props) => {
+const Cadastro = ({ navigation }: Props) => {
   const [nome, setNome] = useState('');
   const [senha, setSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
 
-  const handleLogin = async () => {
-    if (nome === '' || senha === '') {
+  const handleCadastro = () => {
+    if (nome === '' || senha === '' || confirmarSenha === '') {
       Alert.alert('Atenção', 'Preencha todos os campos');
       return;
     }
-  
-    // Verificação de credenciais
-    if (nome === 'admin' && senha === 'admin') {
-      await AsyncStorage.setItem('nome', nome);
-      await AsyncStorage.setItem('tipoUsuario', 'admin'); // Correção: tipo admin
-      navigation.navigate('CategoriesAdmin', { nome });
-    } else if (nome === 'user' && senha === 'user') {
-      await AsyncStorage.setItem('nome', nome);
-      await AsyncStorage.setItem('tipoUsuario', 'usuario');
-      navigation.navigate('categories', { nome });
-    } else {
-      Alert.alert('Erro', 'Usuário ou senha inválidos');
+
+    if (senha !== confirmarSenha) {
+      Alert.alert('Erro', 'As senhas não conferem');
+      return;
     }
+
+    // Aqui você poderia salvar no AsyncStorage ou banco depois
+    Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
+    navigation.navigate('Login');
   };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -40,7 +37,7 @@ const Login = ({ navigation }: Props) => {
     >
       <Image source={require('../../assets/images/jus.jpg')} style={styles.logo} />
       <Text style={styles.title}>Consultas Jurídicas</Text>
-      <Text style={styles.subtitle}>Login</Text>
+      <Text style={styles.subtitle}>Cadastro</Text>
 
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Nome</Text>
@@ -63,15 +60,23 @@ const Login = ({ navigation }: Props) => {
         />
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Confirmar Senha</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Confirme sua senha"
+          secureTextEntry
+          value={confirmarSenha}
+          onChangeText={setConfirmarSenha}
+        />
+      </View>
+
+      <TouchableOpacity style={styles.button} onPress={handleCadastro}>
+        <Text style={styles.buttonText}>Cadastrar</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={styles.secondaryButton} 
-        onPress={() => navigation.navigate('Cadastro')}
-      >
-        <Text style={styles.secondaryButtonText}>Cadastre-se</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <Text style={styles.voltarText}>Já tem uma conta? Entrar</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );
@@ -137,22 +142,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  secondaryButton: {
-    height: 50,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
+  voltarText: {
     marginTop: 15,
-    borderWidth: 1,
-    borderColor: '#007BFF',
-    backgroundColor: 'transparent',
-  },
-  secondaryButtonText: {
     color: '#007BFF',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 14,
   },
 });
 
-export default Login;
+export default Cadastro;
